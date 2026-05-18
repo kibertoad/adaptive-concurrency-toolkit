@@ -1,0 +1,55 @@
+{
+  "name": "@adaptive-concurrency-toolkit/core",
+  "version": "1.0.0",
+  "description": "Core adaptive concurrency algorithms (AIMD, Vegas, Gradient2) inspired by Netflix concurrency-limits",
+  "license": "MIT",
+  "files": [
+    "dist",
+    "!dist/**/*.tsbuildinfo",
+    "!**/*.test.*"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    },
+    "./limit": {
+      "import": {
+        "types": "./dist/limit/index.d.ts",
+        "default": "./dist/limit/index.js"
+      }
+    },
+    "./limiter": {
+      "import": {
+        "types": "./dist/limiter/index.d.ts",
+        "default": "./dist/limiter/index.js"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc -b tsconfig.build.json",
+    "typecheck": "tsc -b tsconfig.json",
+    "test": "vitest run --coverage",
+    "test:watch": "vitest",
+    "clean": "rimraf dist .turbo *.tsbuildinfo",
+    "prepublishOnly": "pnpm run build"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "rimraf": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

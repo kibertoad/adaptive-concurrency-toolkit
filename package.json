@@ -1,0 +1,32 @@
+{
+  "name": "adaptive-concurrency-kit",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Adaptive concurrency primitives inspired by Netflix concurrency-limits",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "test:watch": "turbo run test:watch",
+    "typecheck": "turbo run typecheck",
+    "lint": "oxfmt --check && oxlint",
+    "lint:fix": "oxfmt && oxlint --fix",
+    "clean": "turbo run clean && rimraf node_modules .turbo"
+  },
+  "devDependencies": {
+    "@lokalise/tsconfig": "catalog:",
+    "@types/node": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "oxfmt": "catalog:",
+    "oxlint": "catalog:",
+    "rimraf": "catalog:",
+    "turbo": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "engines": {
+    "node": ">=22.12"
+  },
+  "packageManager": "pnpm@11.1.2"
+}

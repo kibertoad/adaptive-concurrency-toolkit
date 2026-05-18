@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "@lokalise/tsconfig/build-public-lib",
+  "compilerOptions": {
+    "strict": true,
+    "exactOptionalPropertyTypes": true,
+    "noPropertyAccessFromIndexSignature": true
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["**/*.test.ts", "test/**"]
+}
