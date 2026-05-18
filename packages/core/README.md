@@ -214,18 +214,115 @@ onSample(startTimeNanos, rttNanos, inflight, didDrop);
 - No timers, no background tasks. Adjustments happen synchronously when
   samples cross a window boundary.
 
-## Testing
+## Testing with `ManualClock`
 
-Use `ManualClock` to drive the algorithms deterministically:
+Every component that reads time goes through the `Clock` interface:
 
 ```ts
-import { Gradient2Limit, SimpleLimiter, ManualClock } from '@adaptive-concurrency-toolkit/core';
+interface Clock {
+  nowNanos(): Nanos;
+}
+```
+
+The default is `defaultClock`, which wraps `performance.now()`. For tests,
+swap in `ManualClock` — a `Clock` whose value only changes when you tell it
+to. That gives you exact, repeatable control over RTT measurements and over
+when the algorithms cross their internal time boundaries.
+
+### Why you need it
+
+The algorithms in this package are time-sensitive in two ways:
+
+1. **RTT is measured as `clock.nowNanos()` at release minus `clock.nowNanos()`
+   at acquire.** With the real clock, "50 ms RTT" means actually waiting
+   50 ms (slow) or fighting timer jitter (flaky). With `ManualClock`, you
+   call `advanceMillis(50)` between acquire and release and the sample is
+   exactly 50 ms.
+2. **`VegasLimit` and `Gradient2Limit` only adjust at window boundaries**
+   (default `windowNanos: 1_000_000_000`, i.e. 1 second). The limit will not
+   move until the clock has crossed into the next window. If your test
+   doesn't advance the clock past the boundary, the algorithm looks broken
+   when it's actually working as designed.
+
+`AimdLimit` is per-sample rather than windowed, but its drop logic also
+depends on RTT vs. `rttTimeoutNanos`, so the same control matters.
+
+### API
+
+```ts
+new ManualClock(initialNanos?: number);  // defaults to 0
+
+clock.nowNanos();                  // current value
+clock.advanceNanos(deltaNanos);    // current += delta
+clock.advanceMillis(deltaMillis);  // current += delta * 1_000_000
+clock.setNanos(value);             // hard override (fault injection)
+```
+
+Time is held as a `number` (nanoseconds), not `bigint`, matching the rest of
+the package. `advanceNanos` and `advanceMillis` only accept non-negative
+deltas in spirit — the algorithms assume monotonic time, so don't go
+backwards with `setNanos` unless you're specifically testing that path.
+
+### Wiring it in
+
+`ManualClock` is plumbed in through the `SimpleLimiter` options:
+
+```ts
+import {
+  Gradient2Limit,
+  SimpleLimiter,
+  ManualClock,
+} from '@adaptive-concurrency-toolkit/core';
 
 const clock = new ManualClock();
 const limit = new Gradient2Limit({ initialLimit: 10, windowNanos: 1_000_000_000 });
 const limiter = new SimpleLimiter(limit, { clock });
 
-const l = limiter.acquire()!;
+const l = limiter.acquire()!;  // reads clock.nowNanos() as start time
 clock.advanceMillis(50);
-l.onSuccess(); // reports a 50 ms sample
+l.onSuccess();                 // reports a sample with rtt = 50_000_000 ns
 ```
+
+The limiter passes the same `Clock` instance into every listener it issues,
+so all RTT measurements share one time source.
+
+### Crossing a window boundary
+
+This is the pattern for testing window-based algorithms. Feed enough
+samples to fill a window, advance past the boundary, then feed one more
+sample to trigger the recompute:
+
+```ts
+const clock = new ManualClock();
+const limit = new Gradient2Limit({
+  initialLimit: 10,
+  windowNanos: 1_000_000_000, // 1 s
+  // ...
+});
+const limiter = new SimpleLimiter(limit, { clock });
+
+// Fill window 0 with fast samples — should suggest growing the limit.
+for (let i = 0; i < 20; i++) {
+  const l = limiter.acquire()!;
+  clock.advanceMillis(5); // 5 ms RTT, well under any queueing signal
+  l.onSuccess();
+}
+
+// Cross the window boundary. Until we do this, the algorithm has not yet
+// "seen" the end of window 0.
+clock.advanceNanos(1_000_000_000);
+
+// The next sample lands in window 1 and triggers the window-0 recompute.
+const trigger = limiter.acquire()!;
+clock.advanceMillis(5);
+trigger.onSuccess();
+
+expect(limit.limit).toBeGreaterThan(10);
+```
+
+### Bypassing the limiter
+
+If you're unit-testing a `Limit` directly (not through a `Limiter`) you can
+build samples by hand. `onSample(startNanos, rttNanos, inflight, didDrop)`
+is positional and clock-free — `ManualClock` is only needed when something
+else (a `Limiter`, your own wrapper) is reading the clock for you.
