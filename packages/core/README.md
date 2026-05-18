@@ -1,5 +1,9 @@
 # @adaptive-concurrency-toolkit/core
 
+[![npm version](https://img.shields.io/npm/v/@adaptive-concurrency-toolkit/core.svg)](https://www.npmjs.com/package/@adaptive-concurrency-toolkit/core)
+[![npm downloads](https://img.shields.io/npm/dm/@adaptive-concurrency-toolkit/core.svg)](https://www.npmjs.com/package/@adaptive-concurrency-toolkit/core)
+[![license](https://img.shields.io/npm/l/@adaptive-concurrency-toolkit/core.svg)](../../LICENSE)
+
 Core adaptive concurrency algorithms inspired by Netflix's
 [`concurrency-limits`](https://github.com/Netflix/concurrency-limits).
 

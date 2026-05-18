@@ -2,6 +2,29 @@
   "name": "@adaptive-concurrency-toolkit/core",
   "version": "1.0.0",
   "description": "Core adaptive concurrency algorithms (AIMD, Vegas, Gradient2) inspired by Netflix concurrency-limits",
+  "keywords": [
+    "concurrency",
+    "concurrency-limit",
+    "adaptive-concurrency",
+    "rate-limit",
+    "backpressure",
+    "load-shedding",
+    "aimd",
+    "vegas",
+    "gradient2",
+    "netflix",
+    "tcp-congestion-control"
+  ],
+  "homepage": "https://github.com/kibertoad/adaptive-concurrency-toolkit/tree/main/packages/core#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kibertoad/adaptive-concurrency-toolkit.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/kibertoad/adaptive-concurrency-toolkit/issues"
+  },
+  "author": "Igor Savin <kibertoad@gmail.com>",
   "license": "MIT",
   "files": [
     "dist",

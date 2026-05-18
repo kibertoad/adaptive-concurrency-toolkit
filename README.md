@@ -1,5 +1,8 @@
 # adaptive-concurrency-toolkit
 
+[![npm version](https://img.shields.io/npm/v/@adaptive-concurrency-toolkit/core.svg)](https://www.npmjs.com/package/@adaptive-concurrency-toolkit/core)
+[![license](https://img.shields.io/npm/l/@adaptive-concurrency-toolkit/core.svg)](./LICENSE)
+
 TypeScript adaptive concurrency primitives inspired by Netflix's
 [`concurrency-limits`](https://github.com/Netflix/concurrency-limits).
 
