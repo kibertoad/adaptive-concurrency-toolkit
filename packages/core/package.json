@@ -1,6 +1,6 @@
 {
   "name": "@adaptive-concurrency-toolkit/core",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Core adaptive concurrency algorithms (AIMD, Vegas, Gradient2) inspired by Netflix concurrency-limits",
   "keywords": [
     "concurrency",
